@@ -1,0 +1,141 @@
+{
+    "settings": {
+        "management_network": "auto",
+        "diskimage_basepath": "/images"
+    },
+    "networks": [
+        {
+            "name": "link_a",
+            "host_ports": []
+        },
+        {
+            "name": "link_b",
+            "host_ports": []
+        }
+    ],
+    "integrations": [],
+    "instances": [
+        {
+            "name": "vma",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_client.sh",
+            "environment": {
+                "IP_ADDRESS": "10.0.0.1/24",
+                "ROUTE": "10.0.1.0/24 via 10.0.0.2"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "networks": ["link_a"],
+            "applications": [
+                {
+                    "application": "ping",
+                    "name": "a-ping-probe",
+                    "delay": 1,
+                    "runtime": 1,
+                    "settings": {
+                        "target": "10.0.1.1"
+                    },
+                    "dont_store": true
+                },
+                {
+                    "application": "ping",
+                    "name": "a-ping",
+                    "delay": 10,
+                    "runtime": 100,
+                    "settings": {
+                        "target": "10.0.1.1",
+                        "interval": 1
+                    }
+                },
+                {
+                    "application": "run-program",
+                    "name": "tcp-speedtest-client",
+                    "delay": 5,
+                    "runtime": 120,
+                    "settings": {
+                        "command": "tcp_client.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "ADDRESS": "10.0.1.1",
+                            "PORT": 5202
+                        }
+                    },
+                    "dont_store": true
+                }
+            ],
+            "preserve_files": [
+                "/tmp/status.log"
+            ]
+        },
+        {
+            "name": "router",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_router.sh",
+            "environment": {
+                "FORWARD_LINK": "eth1",
+                "RETURN_LINK": "eth2",
+                "FORWARD_TRACE": "{{ FORWARD_TRACE }}",
+                "RETURN_TRACE": "{{ RETURN_TRACE }}"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "netmodel": "virtio",
+            "networks": ["link_a", "link_b"],
+            "applications": [
+                {
+                    "application": "run-program",
+                    "name": "link-emulation",
+                    "delay": 0,
+                    "runtime": 200,
+                    "settings": {
+                        "command": "emulate.sh",
+                        "ignore_timeout": true,
+                        "environment": {
+                            "FORWARD_LINK": "eth1",
+                            "RETURN_LINK": "eth2",
+                            "FORWARD_TRACE": "{{ FORWARD_TRACE }}",
+                            "RETURN_TRACE": "{{ RETURN_TRACE }}"
+                        }
+                    },
+                    "dont_store": true
+                }
+            ],
+            "preserve_files": [
+                "/tmp/trace.log"
+            ]
+        },
+        {
+            "name": "vmb",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_client.sh",
+            "environment": {
+                "IP_ADDRESS": "10.0.1.1/24",
+                "ROUTE": "10.0.0.0/24 via 10.0.1.2"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "networks": ["link_b"],
+            "applications": [
+                {
+                    "application": "run-program",
+                    "name": "tcp-speedtest-server",
+                    "delay": 0,
+                    "runtime": 200,
+                    "settings": {
+                        "command": "tcp_server.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "ADDRESS": "10.0.1.1",
+                            "PORT": 5202
+                        }
+                    },
+                    "dont_store": true
+                }
+            ],
+            "preserve_files": [
+                "/tmp/server.csv",
+                "/tmp/status.log"
+            ]
+        }
+    ]
+}

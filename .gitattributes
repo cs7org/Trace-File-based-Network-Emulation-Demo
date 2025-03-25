@@ -1,0 +1,6 @@
+results/ping_simulation.csv filter=lfs diff=lfs merge=lfs -text
+results/ping_testbed.csv filter=lfs diff=lfs merge=lfs -text
+results/speedtest_emulation.csv filter=lfs diff=lfs merge=lfs -text
+results/speedtest_simulation.csv filter=lfs diff=lfs merge=lfs -text
+results/speedtest_testbed.csv filter=lfs diff=lfs merge=lfs -text
+results/ping_emulation.csv filter=lfs diff=lfs merge=lfs -text

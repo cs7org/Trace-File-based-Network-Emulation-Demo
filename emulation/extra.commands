@@ -1,0 +1,6 @@
+apt-get install -y make wget gcc ethtool iptables python3 tcpdump
+cd /opt
+wget https://github.com/esnet/iperf/releases/download/3.18/iperf-3.18.tar.gz
+tar xzvf iperf-3.18.tar.gz
+cd iperf-3.18
+./configure; make; make install

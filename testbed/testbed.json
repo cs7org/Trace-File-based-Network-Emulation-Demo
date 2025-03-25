@@ -1,0 +1,326 @@
+{
+    "settings": {
+        "management_network": "auto",
+        "diskimage_basepath": "/images"
+    },
+    "networks": [
+        {
+            "name": "n1r1",
+            "host_ports": []
+        },
+        {
+            "name": "n2r1",
+            "host_ports": []
+        },
+        {
+            "name": "r1r2",
+            "host_ports": []
+        },
+        {
+            "name": "n3r2",
+            "host_ports": []
+        },
+        {
+            "name": "n4r2",
+            "host_ports": []
+        }
+    ],
+    "integrations": [],
+    "instances": [
+        {
+            "name": "node1",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_client.sh",
+            "environment": {
+                "IP_ADDRESS": "10.0.1.1/24",
+                "ROUTE": "default via 10.0.1.2",
+                "LINK_RATE": "100Mbit",
+                "LINK_LIMIT": "100"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "networks": ["n1r1"],
+            "applications": [
+                {
+                    "application": "run-program",
+                    "name": "client-n1-n3",
+                    "delay": 20,
+                    "runtime": 85,
+                    "settings": {
+                        "command": "crosstraffic_client.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "IPERF_ADDRESS": "10.0.3.1",
+                            "IPERF_PORT": "1000",
+                            "IPERF_BW": "10M",
+                            "IPERF_TIME": "80",
+                            "IPERF_TCP": "{{ USE_TCP }}"
+                        }
+                    },
+                    "dont_store": true
+                },
+                {
+                    "application": "run-program",
+                    "name": "server-n4-n1",
+                    "delay": 0,
+                    "runtime": 120,
+                    "settings": {
+                        "command": "crosstraffic_server.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "IPERF_ADDRESS": "10.0.1.1",
+                            "IPERF_PORT": "1005"
+                        }
+                    },
+                    "dont_store": true
+                },
+                {
+                    "application": "ping",
+                    "name": "a-ping",
+                    "delay": 10,
+                    "runtime": 100,
+                    "settings": {
+                        "target": "10.0.3.1",
+                        "interval": 1
+                    }
+                }
+            ],
+            "preserve_files": [
+                "/tmp/client.log",
+                "/tmp/server.log"
+            ]
+        },
+        {
+            "name": "node2",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_client.sh",
+            "environment": {
+                "IP_ADDRESS": "10.0.2.1/24",
+                "ROUTE": "default via 10.0.2.2",
+                "LINK_RATE": "100Mbit",
+                "LINK_LIMIT": "100"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "networks": ["n2r1"],
+            "applications": [
+                {
+                    "application": "run-program",
+                    "name": "client-n2-n4",
+                    "delay": 40,
+                    "runtime": 45,
+                    "settings": {
+                        "command": "crosstraffic_client.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "IPERF_ADDRESS": "10.0.4.1",
+                            "IPERF_PORT": "1000",
+                            "IPERF_BW": "10M",
+                            "IPERF_TIME": "40",
+                            "IPERF_TCP": "{{ USE_TCP }}"
+                        }
+                    },
+                    "dont_store": true
+                },
+                {
+                    "application": "run-program",
+                    "name": "server-n3-n2",
+                    "delay": 0,
+                    "runtime": 120,
+                    "settings": {
+                        "command": "crosstraffic_server.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "IPERF_ADDRESS": "10.0.2.1",
+                            "IPERF_PORT": "1005"
+                        }
+                    },
+                    "dont_store": true
+                },
+                {
+                    "application": "run-program",
+                    "name": "tcp-client-n2-n3",
+                    "delay": 0,
+                    "runtime": 130,
+                    "settings": {
+                        "command": "tcp_client.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "ADDRESS": "10.0.3.1",
+                            "PORT": "5201"
+                        }
+                    },
+                    "dont_store": true
+                }
+            ],
+            "preserve_files": [
+                "/tmp/status.log",
+                "/tmp/client.log",
+                "/tmp/server.log"
+            ]
+        },
+        {
+            "name": "node3",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_client.sh",
+            "environment": {
+                "IP_ADDRESS": "10.0.3.1/24",
+                "ROUTE": "default via 10.0.3.2",
+                "LINK_RATE": "100Mbit",
+                "LINK_LIMIT": "100"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "networks": ["n3r2"],
+            "applications": [
+                {
+                    "application": "run-program",
+                    "name": "server-n1-n3",
+                    "delay": 0,
+                    "runtime": 120,
+                    "settings": {
+                        "command": "crosstraffic_server.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "IPERF_ADDRESS": "10.0.3.1",
+                            "IPERF_PORT": "1000"
+                        }
+                    },
+                    "dont_store": true
+                },
+                {
+                    "application": "run-program",
+                    "name": "client-n3-n1",
+                    "delay": 20,
+                    "runtime": 85,
+                    "settings": {
+                        "command": "crosstraffic_client.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "IPERF_ADDRESS": "10.0.1.1",
+                            "IPERF_PORT": "1005",
+                            "IPERF_BW": "10M",
+                            "IPERF_TIME": "80",
+                            "IPERF_TCP": "{{ USE_TCP }}"
+                        }
+                    },
+                    "dont_store": true
+                },
+                {
+                    "application": "run-program",
+                    "name": "tcp-server-n2-n3",
+                    "delay": 0,
+                    "runtime": 130,
+                    "settings": {
+                        "command": "tcp_server.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "ADDRESS": "10.0.3.1",
+                            "PORT": "5201"
+                        }
+                    },
+                    "dont_store": true
+                }
+            ],
+            "preserve_files": [
+                "/tmp/server.csv",
+                "/tmp/status.log",
+                "/tmp/client.log",
+                "/tmp/server.log"
+            ]
+        },
+        {
+            "name": "node4",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_client.sh",
+            "environment": {
+                "IP_ADDRESS": "10.0.4.1/24",
+                "ROUTE": "default via 10.0.4.2",
+                "LINK_RATE": "100Mbit",
+                "LINK_LIMIT": "100"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "networks": ["n4r2"],
+            "applications": [
+                {
+                    "application": "run-program",
+                    "name": "server-n2-n4",
+                    "delay": 0,
+                    "runtime": 120,
+                    "settings": {
+                        "command": "crosstraffic_server.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "IPERF_ADDRESS": "10.0.4.1",
+                            "IPERF_PORT": "1000"
+                        }
+                    },
+                    "dont_store": true
+                },
+                {
+                    "application": "run-program",
+                    "name": "client-n4-n2",
+                    "delay": 40,
+                    "runtime": 45,
+                    "settings": {
+                        "command": "crosstraffic_client.sh",
+                        "ignore_timeout": false,
+                        "environment": {
+                            "IPERF_ADDRESS": "10.0.2.1",
+                            "IPERF_PORT": "1005",
+                            "IPERF_BW": "10M",
+                            "IPERF_TIME": "40",
+                            "IPERF_TCP": "{{ USE_TCP }}"
+                        }
+                    },
+                    "dont_store": true
+                }
+            ],
+            "preserve_files": [
+                "/tmp/client.log",
+                "/tmp/server.log"
+            ]
+        },
+        {
+            "name": "router1",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_router.sh",
+            "environment": {
+                "NODE_A_ADDRESS": "10.0.1.2/24",
+                "NODE_B_ADDRESS": "10.0.2.2/24",
+                "ROUTER_ADDRESS": "10.0.10.1/24",
+                "ROUTE": "default via 10.0.10.2",
+                "LINK_RATE": "100Mbit",
+                "LINK_LIMIT": "100",
+                "ROUTER_RATE": "30Mbit",
+                "ROUTER_DELAY": "10ms",
+                "ROUTER_LIMIT": "150"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "networks": ["r1r2", "n1r1", "n2r1"],
+            "applications": []
+        },
+        {
+            "name": "router2",
+            "diskimage": "debian-iperf.qcow2",
+            "setup_script": "setup_router.sh",
+            "environment": {
+                "NODE_A_ADDRESS": "10.0.3.2/24",
+                "NODE_B_ADDRESS": "10.0.4.2/24",
+                "ROUTER_ADDRESS": "10.0.10.2/24",
+                "ROUTE": "default via 10.0.10.1",
+                "LINK_RATE": "100Mbit",
+                "LINK_LIMIT": "100",
+                "ROUTER_RATE": "30Mbit",
+                "ROUTER_DELAY": "10ms",
+                "ROUTER_LIMIT": "150"
+            },
+            "cores": 2,
+            "memory": 1024,
+            "networks": ["r1r2", "n3r2", "n4r2"],
+            "applications": []
+        }
+    ]
+}
