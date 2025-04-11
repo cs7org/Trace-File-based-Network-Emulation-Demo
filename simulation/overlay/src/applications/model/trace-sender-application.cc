@@ -392,14 +392,18 @@ void TraceSender::WriteResults(QueueAccumulationMethod mode) {
           }
           break;
         case QueueAccumulationMethod::BOTTLENECK:
-          if (bottleneck_at > value->queue_capacities.size()) {
-            queue_capacity += value->queue_capacities[value->queue_capacities.size() - 1];
+          if (bottleneck_at >= value->queue_capacities.size()) {
+            if (value->queue_capacities.size() == 0) {
+              queue_capacity = 0;
+            } else {
+              queue_capacity = value->queue_capacities[value->queue_capacities.size() - 1];
+            }
           } else {
             queue_capacity += value->queue_capacities[bottleneck_at];
           }
           break;
         case QueueAccumulationMethod::SUM_TO_BOTTLENECK:
-          for (long unsigned int index = 0; index <= std::min(bottleneck_at, value->queue_capacities.size() - 1); index++) {
+          for (long unsigned int index = 0; index <= std::min(bottleneck_at, std::max(value->queue_capacities.size() - 1, 0UL)); index++) {
             queue_capacity += value->queue_capacities[index];
           }
           break;
