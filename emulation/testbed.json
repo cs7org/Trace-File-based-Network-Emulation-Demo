@@ -79,7 +79,6 @@
             },
             "cores": 2,
             "memory": 1024,
-            "netmodel": "virtio",
             "networks": ["link_a", "link_b"],
             "applications": [
                 {
