@@ -25,7 +25,7 @@ cp client server ../testbed/.
 ### Full Normal Tests (UDP Crosstraffic)
 
 ```bash
-sudo FORWRARD_TRACE=trace_normal/forward.csv RETURN_TRACE=trace_normal/return.csv p2t run -p out -e emulation .
+sudo FORWARD_TRACE=trace_normal/forward.csv RETURN_TRACE=trace_normal/return.csv p2t run -p out -e emulation .
 p2t export csv -e emulation -o csvs --skip_substitution .
 p2t clean -e emulation
 mv csvs/vma/a-ping/ping_rtt.csv ../results/ping_emulation.csv
@@ -35,7 +35,7 @@ rm -rf out/ csvs/
 
 ### TCP Crosstraffic Tests
 ```bash
-sudo FORWRARD_TRACE=trace_tcp_cross_traffic/forward.csv RETURN_TRACE=trace_tcp_cross_traffic/return.csv p2t run -p out -d .
+sudo FORWARD_TRACE=trace_tcp_cross_traffic/forward.csv RETURN_TRACE=trace_tcp_cross_traffic/return.csv p2t run -p out -d .
 mv out/vmb/tmp/server.csv ../results/crosstraffic/speedtest_emulation.csv
 rm -rf out/
 ```

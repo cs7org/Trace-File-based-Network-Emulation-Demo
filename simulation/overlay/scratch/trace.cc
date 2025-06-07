@@ -39,6 +39,10 @@ int main(int argc, char* argv[]) {
 
     SeedManager::SetSeed(seed);
 
+    Config::SetDefault ("ns3::TcpL4Protocol::SocketType", StringValue("ns3::TcpCubic"));
+    Config::SetDefault ("ns3::TcpSocket::RcvBufSize", UintegerValue(6291456));
+    Config::SetDefault ("ns3::TcpSocket::SndBufSize", UintegerValue(6291456));
+
     NodeContainer nodes;
     nodes.Create(4);
 

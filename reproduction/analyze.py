@@ -48,7 +48,7 @@ def main():
 
     plt.style.use('ggplot')
     plt.figure(figsize=(7, 3))
-    sns.stripplot(data=[simulation, emulation, testbed], palette=["tab:red", "tab:orange", "tab:blue"], orient='h', jitter=0.4, size=5)
+    sns.stripplot(data=[simulation, emulation, testbed], palette=["m", "tab:green", "tab:blue"], orient='h', jitter=0.4, size=5)
     plt.yticks(ticks=[0,1,2], labels=["ns-3 Simulation", "Emulation", "Real Testbed"])
     plt.xlim(8.2, 9)
     plt.xlabel("Mean Goodput (Mbit/s)", fontsize=14, color='black')

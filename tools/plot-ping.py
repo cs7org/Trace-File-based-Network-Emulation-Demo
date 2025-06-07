@@ -3,6 +3,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from color import *
+
 file_simulation = "../results/ping_simulation.csv"
 file_emulation = "../results/ping_emulation.csv"
 file_testbed = "../results/ping_testbed.csv"
@@ -21,9 +23,9 @@ def main():
     ax.set_xlabel("Time (s)", fontsize=16, color='black')
     ax.set_xlim(10, 110)
     ax.set_ylabel("IMCP Ping RTT (ms)", fontsize=16, color='black')
-    ax.plot(series_simulation["time"], series_simulation["rtt"], label="ns-3 Simulation", color="tab:red", linewidth=2)
-    ax.plot(series_emulation["time"], series_emulation["rtt"], label="Emulation", color="tab:orange", linewidth=2)
-    ax.plot(series_testbed["time"], series_testbed["rtt"], label="Real Testbed", color="tab:blue", linewidth=2)
+    ax.plot(series_simulation["time"], series_simulation["rtt"], label="ns-3 Simulation", color=SIMULATION, linewidth=2)
+    ax.plot(series_emulation["time"], series_emulation["rtt"], label="Emulation", color=EMULATION, linewidth=2)
+    ax.plot(series_testbed["time"], series_testbed["rtt"], label="Real Testbed", color=TESTBED, linewidth=2)
     ax.legend(loc="upper center", fontsize=14)
     ax.grid(color='white', linestyle='-', linewidth=1.5)
     ax.tick_params(axis='y', which='both', labelsize=16, color='black')

@@ -3,6 +3,8 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 
+from color import *
+
 file_simulation = "../results/speedtest_simulation.csv"
 file_emulation = "../results/speedtest_emulation.csv"
 file_testbed = "../results/speedtest_testbed.csv"
@@ -35,9 +37,9 @@ def main():
     ax.set_xlim(10, 110)
     ax.set_ylim(0, 35)
     ax.set_ylabel("Speedtest Goodput (Mbps)", fontsize=16, color='black')
-    ax.plot(series_simulation["receive_time"], series_simulation["bitrate_ma"], label="ns-3 Simulation", color="tab:red", linewidth=2)
-    ax.plot(series_emulation["receive_time"], series_emulation["bitrate_ma"], label="Emulation", color="tab:orange", linewidth=2)
-    ax.plot(series_testbed["receive_time"], series_testbed["bitrate_ma"], label="Real Testbed", color="tab:blue", linewidth=2)
+    ax.plot(series_simulation["receive_time"], series_simulation["bitrate_ma"], label="ns-3 Simulation", color=SIMULATION, linewidth=2)
+    ax.plot(series_emulation["receive_time"], series_emulation["bitrate_ma"], label="Emulation", color=EMULATION, linewidth=2)
+    ax.plot(series_testbed["receive_time"], series_testbed["bitrate_ma"], label="Real Testbed", color=TESTBED, linewidth=2)
     ax.legend(loc="upper center", fontsize=14)
     ax.grid(color='white', linestyle='-', linewidth=1.5)
     ax.tick_params(axis='y', which='both', labelsize=16, color='black')
