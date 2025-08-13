@@ -18,7 +18,7 @@ Build the *tcp-test* applications in `../tcp-test` and copy the binaries:
 ```bash
 cd ../tcp-test
 make all
-cp client server ../testbed/.
+cp client server ../emulation/.
 ```
 
 ## Run the Experiments
