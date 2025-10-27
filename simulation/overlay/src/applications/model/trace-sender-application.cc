@@ -125,12 +125,14 @@ TraceSender::TraceSender ()
 
 TraceElement::TraceElement ()
   : receive_time (0),
+    path_id (0),
     received (false),
     hop_count (0)
 {
   send_time = Simulator::Now().GetMicroSeconds();
   link_capacities = {};
   queue_capacities = {};
+  path = {};
 }
 
 TraceSender::~TraceSender()
@@ -340,7 +342,7 @@ void TraceSender::WriteResults(QueueAccumulationMethod mode) {
 
   FILE* trace_csv = fopen(filename.c_str(), "w+");
 
-  fprintf(trace_csv, "at,delay,stddev,min_link_cap,max_link_cap,queue_capacity,hops,dropratio\n");
+  fprintf(trace_csv, "at,delay,stddev,min_link_cap,max_link_cap,queue_capacity,hops,dropratio,route\n");
 
   for (const auto& block : blocks) {
     if (block.size() == 0) continue;
@@ -352,6 +354,11 @@ void TraceSender::WriteResults(QueueAccumulationMethod mode) {
     uint64_t queue_capacity = 0;
     uint32_t hops = block[0].second->hop_count;
     uint64_t drops = 0;
+    uint16_t route = block[0].second->path_id;
+
+    if (route == 0) {
+      route = block[block.size() - 1].second->path_id;
+    }
 
     for (const auto& entry : block) {
       auto& value = entry.second;
@@ -431,7 +438,7 @@ void TraceSender::WriteResults(QueueAccumulationMethod mode) {
       dropratio = 1.0;
     }
 
-    fprintf(trace_csv, "%" PRIu64 ",%" PRIu64 ",%.2f,%.2f,%.2f,%" PRIu64 ",%" PRIu32 ",%.2f\n",
+    fprintf(trace_csv, "%" PRIu64 ",%" PRIu64 ",%.2f,%.2f,%.2f,%" PRIu64 ",%" PRIu32 ",%.2f,%" PRIu16 "\n",
       block[0].second->send_time - m_firstTransmission,
       avg_delay,
       std_dev,
@@ -439,7 +446,8 @@ void TraceSender::WriteResults(QueueAccumulationMethod mode) {
       max_link_cap,
       queue_capacity,
       hops,
-      dropratio
+      dropratio,
+      route
     );
   }
 
@@ -470,6 +478,7 @@ void TraceSender::addHopDetails(Ptr<const Packet> packet, double link_load, uint
   } else {
     element->queue_capacities.push_back(0);
   }
+  element->path.push_back(at_node);
   element->link_capacities.push_back(link_load);
   element->transmit_times.push_back(Simulator::Now().GetMicroSeconds());
   element->hop_count++;
@@ -490,6 +499,9 @@ void TraceSender::addReceptionDetails(Ptr<const Packet> packet, uint32_t at_node
   if (!packet->FindFirstMatchingByteTag(tag)) return;
 
   Ptr<TraceElement> element = m_trace_map.at(tag.GetId());
+  element->path.push_back(at_node);
+  element->path_id = TracePathManager::GetInstance().GetOrCreateRouteId(element->path);
+  element->path.clear();
   element->receive_time = Simulator::Now().GetMicroSeconds();
   element->received = true;
 }

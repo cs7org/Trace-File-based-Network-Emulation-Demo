@@ -12,6 +12,9 @@
 #include <map>
 #include <tuple>
 #include <vector>
+#include <unordered_map>
+#include <cstdint>
+#include <functional>
 
 namespace ns3 {
 
@@ -26,6 +29,8 @@ public:
   std::vector<double> link_capacities;
   std::vector<uint64_t> queue_capacities;
   std::vector<uint64_t> transmit_times;
+  std::vector<uint64_t> path;
+  uint16_t path_id;
   bool received;
   uint32_t hop_count;
 
@@ -189,6 +194,46 @@ private:
   uint64_t packet_counter = 1;
   std::map<uint16_t, TraceSender *> flow_map{};
   std::map<uint64_t, uint16_t> packet_map{};
+};
+
+class TracePathManager {
+public:
+  static TracePathManager& GetInstance() {
+    static TracePathManager instance;
+    return instance;
+  }
+
+  uint16_t GetOrCreateRouteId(const std::vector<uint64_t>& path) {
+    uint64_t hash = HashPath(path);
+
+    auto it = path_to_id.find(hash);
+    if (it != path_to_id.end()) {
+        return it->second;
+    }
+
+    uint16_t new_id = next_id++;
+    if (new_id == 0) new_id = next_id++;
+
+    path_to_id[hash] = new_id;
+    return new_id;
+  }
+private:
+  TracePathManager() : next_id(1) {}
+  TracePathManager(const TracePathManager&) = delete;
+  TracePathManager& operator=(const TracePathManager) = delete;
+
+  uint64_t HashPath(const std::vector<uint64_t>& path) const {
+    std::hash<uint64_t> hasher;
+    uint64_t h = 1469598103934665603ULL;
+      for (auto v : path) {
+        h ^= hasher(v);
+        h *= 1099511628211ULL;
+      }
+      return h;
+    }
+
+  std::unordered_map<uint64_t, uint16_t> path_to_id;
+  uint16_t next_id;
 };
 
 } // namespace ns3

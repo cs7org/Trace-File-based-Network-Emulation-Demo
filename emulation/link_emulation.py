@@ -19,6 +19,7 @@ jitter           = netem delay jitter [ms]
 loss             = outgoing packet loss [%]
 queue_capacity   = capacity of the queue between both endpoints [packets]
 hops             = number of hops emulated [hops]
+route            = route id [id]
 """
 
 MIN_UPDATE_MS = 100
@@ -57,6 +58,7 @@ class TraceFileEntry:
         self.loss: float
         self.hops: int
         self.queue_cap: int
+        self.route_id: int
         self.interface: str = interface
 
     def __str__(self) -> str:
@@ -67,7 +69,7 @@ class TraceFileEntry:
         if len(parts) != 8:
             return False
 
-        at, delay, stddev, min_link_cap, _, queue_cap, hops, drop = parts
+        at, delay, stddev, min_link_cap, _, queue_cap, hops, drop, route_id = parts
         min_link_cap = int(float(min_link_cap))
 
         try:
@@ -77,6 +79,7 @@ class TraceFileEntry:
             self.jitter = int(float(stddev) // 1000) # µs to ms
             self.loss = float(drop) * 100 # 0-1 to %
             self.hops = int(hops)
+            self.route_id = int(route_id)
             self.queue_cap = int(queue_cap)
         except Exception as ex:
             print(ex)
